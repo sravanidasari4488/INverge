@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useUser, useAuth } from '@clerk/clerk-expo';
-import { Redirect, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 export default function DetailsScreen() {
   const router = useRouter();
@@ -69,8 +69,16 @@ export default function DetailsScreen() {
     }
   };
 
-  if (!isSignedIn) return <Redirect href="/(auth)/sign-in" />;
   if (!isLoaded) return null;
+
+  if (!isSignedIn) {
+    return (
+      <View style={styles.loadingWrap}>
+        <ActivityIndicator color="#6c5ce7" />
+        <Text style={styles.loadingText}>Finalizing sign-up…</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -181,4 +189,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   secondaryText: { color: '#d1d1d6', fontWeight: '600' },
+  loadingWrap: { flex: 1, backgroundColor: '#0a0a0a', alignItems: 'center', justifyContent: 'center' },
+  loadingText: { marginTop: 10, color: '#a0a0a0' },
 });

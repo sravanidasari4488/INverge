@@ -179,7 +179,7 @@ export default function SignUpScreen() {
 
             {error ? <Text style={styles.error}>{error}</Text> : null}
 
-            <TouchableOpacity style={styles.primaryBtn} onPress={onVerifyPress} disabled={loading || !code}>
+            <TouchableOpacity style={styles.primaryBtn} onPress={onVerifyPress} disabled={loading || code.length < 4}>
               {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryText}>Verify & Continue</Text>}
             </TouchableOpacity>
 
