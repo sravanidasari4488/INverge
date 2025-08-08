@@ -21,6 +21,42 @@ export default function SignUpScreen() {
     }
   }, [isSignedIn, router]);
 
+  // Proactively check if sign-up is already complete (e.g., verified elsewhere)
+  useEffect(() => {
+    const checkExisting = async () => {
+      if (!isLoaded || stage !== 'verify') return;
+      try {
+        const reloaded = await signUp.reload();
+        if (reloaded?.status === 'complete' && reloaded?.createdSessionId) {
+          await setActive({ session: reloaded.createdSessionId });
+          router.replace('/details');
+        }
+      } catch {}
+    };
+    checkExisting();
+  }, [isLoaded, signUp, setActive, router, stage]);
+
+  const finalizeFromReload = async () => {
+    if (!isLoaded) return false;
+    setLoading(true);
+    setError(null);
+    try {
+      const reloaded = await signUp.reload();
+      if (reloaded?.status === 'complete' && reloaded?.createdSessionId) {
+        await setActive({ session: reloaded.createdSessionId });
+        router.replace('/details');
+        return true;
+      }
+      setError('Still waiting for verification. If you entered the code, try again or resend.');
+      return false;
+    } catch (e: any) {
+      setError('Could not confirm verification yet. Please try again.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const onSignUpPress = async () => {
     if (!isLoaded) return;
     setLoading(true);
@@ -47,9 +83,8 @@ export default function SignUpScreen() {
         router.replace('/details');
         return;
       }
-      // Fallback: if the email is already verified and session exists, Clerk may sign you in asynchronously
-      // The isSignedIn effect above will catch this and redirect.
-      setError('Verification pending. If you already verified, please wait a moment.');
+      // If not complete, reload to see if backend marked it complete
+      await finalizeFromReload();
     } catch (err: any) {
       const raw = err?.errors?.[0] || {};
       const codeId = raw.code || '';
@@ -57,14 +92,8 @@ export default function SignUpScreen() {
 
       // If email already verified elsewhere, reload sign-up and finalize session
       if (codeId === 'verification_already_verified' || /already verified/i.test(message)) {
-        try {
-          const reloaded = await signUp.reload();
-          if (reloaded?.status === 'complete' && reloaded?.createdSessionId) {
-            await setActive({ session: reloaded.createdSessionId });
-            router.replace('/details');
-            return;
-          }
-        } catch (_) {}
+        const done = await finalizeFromReload();
+        if (done) return;
       }
 
       setError(/too many requests/i.test(message) ? 'Too many attempts. Please wait a minute and try again.' : message);
@@ -156,6 +185,10 @@ export default function SignUpScreen() {
 
             <TouchableOpacity style={[styles.secondaryBtn, { marginTop: 10 }]} onPress={resendCode} disabled={loading}>
               <Text style={styles.secondaryText}>Resend code</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.secondaryBtn, { marginTop: 10 }]} onPress={finalizeFromReload} disabled={loading}>
+              <Text style={styles.secondaryText}>Check status</Text>
             </TouchableOpacity>
           </>
         )}
