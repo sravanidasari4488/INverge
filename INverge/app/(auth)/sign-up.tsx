@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { useSignUp } from '@clerk/clerk-expo';
+import { useSignUp, useAuth } from '@clerk/clerk-expo';
 import { Link, useRouter } from 'expo-router';
 
 export default function SignUpScreen() {
   const router = useRouter();
+  const { isSignedIn } = useAuth();
   const { isLoaded, signUp, setActive } = useSignUp();
 
   const [email, setEmail] = useState('');
@@ -13,6 +14,12 @@ export default function SignUpScreen() {
   const [stage, setStage] = useState<'form' | 'verify'>('form');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      router.replace('/details');
+    }
+  }, [isSignedIn, router]);
 
   const onSignUpPress = async () => {
     if (!isLoaded) return;
@@ -38,11 +45,43 @@ export default function SignUpScreen() {
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId });
         router.replace('/details');
-      } else {
-        setError('Verification incomplete.');
+        return;
       }
+      // Fallback: if the email is already verified and session exists, Clerk may sign you in asynchronously
+      // The isSignedIn effect above will catch this and redirect.
+      setError('Verification pending. If you already verified, please wait a moment.');
     } catch (err: any) {
-      setError(err?.errors?.[0]?.message || 'Invalid code. Try again.');
+      const raw = err?.errors?.[0] || {};
+      const codeId = raw.code || '';
+      const message = raw.message || raw.longMessage || 'Invalid or expired code.';
+
+      // If email already verified elsewhere, reload sign-up and finalize session
+      if (codeId === 'verification_already_verified' || /already verified/i.test(message)) {
+        try {
+          const reloaded = await signUp.reload();
+          if (reloaded?.status === 'complete' && reloaded?.createdSessionId) {
+            await setActive({ session: reloaded.createdSessionId });
+            router.replace('/details');
+            return;
+          }
+        } catch (_) {}
+      }
+
+      setError(/too many requests/i.test(message) ? 'Too many attempts. Please wait a minute and try again.' : message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resendCode = async () => {
+    if (!isLoaded) return;
+    setLoading(true);
+    setError(null);
+    try {
+      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+      setError('We sent a new code. Check your inbox.');
+    } catch (err: any) {
+      setError(err?.errors?.[0]?.message || 'Could not resend code.');
     } finally {
       setLoading(false);
     }
@@ -95,7 +134,7 @@ export default function SignUpScreen() {
         ) : (
           <>
             <Text style={styles.title}>Verify your email</Text>
-            <Text style={styles.subtitle}>Enter the 6-digit code sent to {email}</Text>
+            <Text style={styles.subtitle}>Enter the 6-digit code we sent</Text>
 
             <View style={styles.field}>
               <Text style={styles.label}>Verification code</Text>
@@ -111,12 +150,12 @@ export default function SignUpScreen() {
 
             {error ? <Text style={styles.error}>{error}</Text> : null}
 
-            <TouchableOpacity style={styles.primaryBtn} onPress={onVerifyPress} disabled={loading}>
+            <TouchableOpacity style={styles.primaryBtn} onPress={onVerifyPress} disabled={loading || !code}>
               {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryText}>Verify & Continue</Text>}
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.secondaryBtn, { marginTop: 10 }]} onPress={() => setStage('form')} disabled={loading}>
-              <Text style={styles.secondaryText}>Change email</Text>
+            <TouchableOpacity style={[styles.secondaryBtn, { marginTop: 10 }]} onPress={resendCode} disabled={loading}>
+              <Text style={styles.secondaryText}>Resend code</Text>
             </TouchableOpacity>
           </>
         )}
