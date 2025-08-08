@@ -19,7 +19,7 @@ export default function SignInScreen() {
       const result = await signIn.create({ identifier: email.trim(), password });
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId });
-        router.replace('/(tabs)');
+        router.replace('/details');
       } else {
         setError('Additional steps required. Please continue in the opened modal.');
       }
