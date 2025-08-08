@@ -115,7 +115,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Startup Showcase</h3>
               <p className="text-gray-600 leading-relaxed">
-                Share your journey, get feedback, and discover opportunities. Build your startup's presence in the community.
+                Share your journey, get feedback, and discover opportunities. Build your startup&apos;s presence in the community.
               </p>
             </div>
           </div>
