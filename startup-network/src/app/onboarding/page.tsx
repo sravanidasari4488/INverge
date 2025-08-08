@@ -28,14 +28,14 @@ export default function OnboardingPage() {
             Welcome to INverge! 🎉
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            You're now part of an exclusive network of startup founders, investors, and innovators. 
-            Let's get you set up for success.
+            You&apos;re now part of an exclusive network of startup founders, investors, and innovators. 
+            Let&apos;s get you set up for success.
           </p>
         </div>
         
         <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-xl border border-white/20">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            What's Next?
+            What&apos;s Next?
           </h2>
           
           <div className="grid md:grid-cols-2 gap-8 mb-12">
@@ -45,7 +45,7 @@ export default function OnboardingPage() {
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Complete Your Profile</h3>
               <p className="text-gray-600">
-                Tell us about your startup, experience, and what you're looking for to get better connections.
+                Tell us about your startup, experience, and what you&apos;re looking for to get better connections.
               </p>
             </div>
             

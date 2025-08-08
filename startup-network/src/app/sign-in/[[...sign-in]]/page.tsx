@@ -59,7 +59,7 @@ export default function SignInPage() {
               </div>
               <div>
                 <h3 className="text-lg font-semibold mb-2">Expert Mentorship</h3>
-                <p className="text-blue-100">Learn from successful entrepreneurs who've been there</p>
+                <p className="text-blue-100">Learn from successful entrepreneurs who&apos;ve been there</p>
               </div>
             </div>
           </div>
@@ -95,6 +95,8 @@ export default function SignInPage() {
           {/* Clerk Sign In Component */}
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
             <SignIn 
+              afterSignInUrl="/dashboard"
+              signUpUrl="/sign-up"
               appearance={{
                 elements: {
                   rootBox: "mx-auto",
@@ -119,7 +121,7 @@ export default function SignInPage() {
           {/* Sign Up Link */}
           <div className="text-center mt-8">
             <p className="text-gray-600">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link 
                 href="/sign-up" 
                 className="text-blue-600 hover:text-blue-700 font-medium transition-colors"

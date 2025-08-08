@@ -26,12 +26,12 @@ export default function DashboardPage() {
             Welcome to your Dashboard! 🚀
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            You've successfully signed in. This is where your startup journey begins.
+            You&apos;ve successfully signed in. This is where your startup journey begins.
           </p>
           <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-200 max-w-2xl mx-auto">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Coming Soon</h2>
             <p className="text-gray-600">
-              We're building amazing features to help you connect with other founders, 
+              We&apos;re building amazing features to help you connect with other founders, 
               find investors, and grow your startup. Stay tuned!
             </p>
           </div>

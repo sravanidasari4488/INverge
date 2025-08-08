@@ -86,7 +86,7 @@ export default function SignUpPage() {
               <span className="text-white font-medium">4.9/5</span>
             </div>
             <p className="text-purple-100 text-sm">
-              "INverge helped me find my co-founder and secure our Series A. Game changer!" 
+              &quot;INverge helped me find my co-founder and secure our Series A. Game changer!&quot; 
               <span className="block mt-1 font-medium">- Sarah Chen, CEO of TechFlow</span>
             </p>
           </div>
@@ -122,6 +122,8 @@ export default function SignUpPage() {
           {/* Clerk Sign Up Component */}
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
             <SignUp 
+              afterSignUpUrl="/onboarding"
+              signInUrl="/sign-in"
               appearance={{
                 elements: {
                   rootBox: "mx-auto",
