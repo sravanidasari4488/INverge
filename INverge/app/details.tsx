@@ -61,7 +61,7 @@ export default function DetailsScreen() {
         const blob = await (await fetch(imageUri)).blob();
         await user.setProfileImage({ file: blob });
       }
-      router.replace('/(tabs)');
+      router.replace('/roles');
     } catch (err: any) {
       setError(err?.errors?.[0]?.message || 'Failed to save details.');
     } finally {
