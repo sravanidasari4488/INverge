@@ -56,11 +56,24 @@ export default function DetailsScreen() {
     setSaving(true);
     setError(null);
     try {
-      await user.update({ firstName, lastName, publicMetadata: { location: { city, country } }, privateMetadata: { phoneNumber } });
-      if (imageUri) {
-        const blob = await (await fetch(imageUri)).blob();
-        await user.setProfileImage({ file: blob });
-      }
+      const nextPublic = { ...(user.publicMetadata as any), location: { city, country } };
+      const nextPrivate = { ...(user.privateMetadata as any), phoneNumber };
+
+      await user.update({ firstName, lastName, publicMetadata: nextPublic, privateMetadata: nextPrivate });
+
+      // Attempt image upload without blocking navigation
+      const uploadImage = async () => {
+        if (!imageUri) return;
+        try {
+          const response = await fetch(imageUri);
+          const blob = await response.blob();
+          await user.setProfileImage({ file: blob });
+        } catch (_) {
+          // Ignore image upload errors to not block onboarding flow
+        }
+      };
+      uploadImage();
+
       router.replace('/roles');
     } catch (err: any) {
       setError(err?.errors?.[0]?.message || 'Failed to save details.');
