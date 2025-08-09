@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { useSignIn } from '@clerk/clerk-expo';
+import { useSignIn, useAuth } from '@clerk/clerk-expo';
 import { Link, useRouter } from 'expo-router';
 
 export default function SignInScreen() {
   const router = useRouter();
   const { isLoaded, signIn, setActive } = useSignIn();
+  const { isSignedIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (isSignedIn) {
+      router.replace('/details');
+    }
+  }, [isSignedIn, router]);
 
   const onSignInPress = async () => {
     if (!isLoaded) return;
@@ -24,7 +31,14 @@ export default function SignInScreen() {
         setError('Additional steps required. Please continue in the opened modal.');
       }
     } catch (err: any) {
-      setError(err?.errors?.[0]?.message || 'Unable to sign in. Check your credentials.');
+      const raw = err?.errors?.[0] || {};
+      const message = raw.message || raw.longMessage || '';
+      // If a session is already active, just proceed
+      if (/already signed in|session already exists/i.test(message)) {
+        router.replace('/details');
+        return;
+      }
+      setError(message || 'Unable to sign in. Check your credentials.');
     } finally {
       setLoading(false);
     }
