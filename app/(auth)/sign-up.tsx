@@ -60,8 +60,10 @@ export default function SignUpScreen() {
         code,
       });
 
-      await setActive({ session: completeSignUp.createdSessionId });
-      router.replace('/(auth)/role-selection');
+      if (completeSignUp.status === 'complete') {
+        await setActive({ session: completeSignUp.createdSessionId });
+        router.replace('/(auth)/role-selection');
+      }
     } catch (err: any) {
       Alert.alert('Error', err.errors?.[0]?.message || 'Invalid verification code');
     } finally {
