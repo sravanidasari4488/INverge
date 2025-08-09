@@ -10,6 +10,19 @@ import { ThemedView } from '@/components/ThemedView';
 
 export default function HomeScreen() {
   const { signOut, user } = useAuth();
+  
+  const userRoles = user?.publicMetadata?.roles as string[] || [];
+  const roleLabels = {
+    founder: 'Startup Founder',
+    investor: 'Investor',
+    developer: 'Developer',
+    designer: 'Designer',
+    marketer: 'Marketer',
+    consultant: 'Consultant',
+    jobseeker: 'Job Seeker',
+    service: 'Service Provider',
+    other: 'Other',
+  };
 
   return (
     <ParallaxScrollView
@@ -24,6 +37,16 @@ export default function HomeScreen() {
         <ThemedText type="title">Welcome, {user?.firstName}!</ThemedText>
         <HelloWave />
       </ThemedView>
+      
+      {userRoles.length > 0 && (
+        <ThemedView style={styles.stepContainer}>
+          <ThemedText type="subtitle">Your Roles</ThemedText>
+          <ThemedText>
+            {userRoles.map(role => roleLabels[role as keyof typeof roleLabels] || role).join(', ')}
+          </ThemedText>
+        </ThemedView>
+      )}
+      
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
