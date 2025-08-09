@@ -25,6 +25,18 @@ In the output, you'll find options to open the app in a
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
+## Auth (Clerk)
+
+- Add your Clerk publishable key in `.env`:
+
+```
+EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+```
+
+- Routes:
+  - `/(auth)/sign-in` and `/(auth)/sign-up`
+  - Root `index` redirects based on auth state
+
 ## Get a fresh project
 
 When you're ready, run:
